@@ -1,7 +1,7 @@
 /*
- * Copyright 2019, Cypress Semiconductor Corporation or a subsidiary of 
+ * Copyright 2019, Cypress Semiconductor Corporation or a subsidiary of
  * Cypress Semiconductor Corporation. All Rights Reserved.
- * 
+ *
  * This software, associated documentation and materials ("Software"),
  * is owned by Cypress Semiconductor Corporation
  * or one of its subsidiaries ("Cypress") and is protected by and subject to
@@ -33,7 +33,9 @@
 
 #pragma once
 
-#include <stdint.h>
+#include "wiced.h"
+#include "PING.h"
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -46,11 +48,6 @@ extern "C" {
 /******************************************************
  *                    Constants
  ******************************************************/
-
-#define PING_THREAD_STACK_SIZE (2500)
-#define PING_DESCRIPTION_LEN    (200)
-#define PING_HISTORY_LEN          (5)
-#define PING_RESULT_LEN          (30)
 
 /******************************************************
  *                   Enumerations

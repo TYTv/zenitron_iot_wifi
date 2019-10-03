@@ -30,9 +30,10 @@
  # so agrees to indemnify Cypress against all liability.
 #
 
-NAME := App_Ping_webserver
+NAME := zenitron_iot_wifi
 
-$(NAME)_SOURCES    := ping_webserver.c
+$(NAME)_SOURCES    := start.c \
+                      PING.c \
 
 $(NAME)_COMPONENTS := daemons/HTTP_server \
                       daemons/Gedday
@@ -46,6 +47,8 @@ $(NAME)_RESOURCES  := apps/ping_webserver/top.html \
                       scripts/wpad.dat
 
 APPLICATION_DCT    := ping_webserver_dct.c
+
+WIFI_CONFIG_DCT_H  := wifi_config_dct.h
 
 ifeq ($(PLATFORM),$(filter $(PLATFORM), CYW9MCU7X9N364))
 GLOBAL_DEFINES += APPLICATION_STACK_SIZE=14*1024

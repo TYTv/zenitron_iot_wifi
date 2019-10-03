@@ -71,7 +71,7 @@
  */
 
 #include "wiced.h"
-#include "ping_webserver.h"
+#include "PING.h"
 #include "http_server.h"
 #include "gedday.h"
 #include "wiced_resource.h"
@@ -139,12 +139,27 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
     { "/images/cypresslogo_line.png",    "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_images_DIR_cypresslogo_line_png, },
 END_OF_HTTP_PAGE_DATABASE();
 
+#if 1   // SOFT AP MODE
+static const wiced_ip_setting_t device_init_ip_settings =
+{
+    INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192, 168, 0,  1) ),
+    INITIALISER_IPV4_ADDRESS( .netmask,    MAKE_IPV4_ADDRESS(255, 255, 255, 0) ),
+    INITIALISER_IPV4_ADDRESS( .gateway,    MAKE_IPV4_ADDRESS(192, 168, 0,  1) ),
+};
+#define DHCP_SETTING    WICED_USE_INTERNAL_DHCP_SERVER
+#define IP_SETTING      &device_init_ip_settings
+static const wiced_interface_t wiced_network_interface = WICED_AP_INTERFACE;
+#else   // STA MODE
+#define DHCP_SETTING    WICED_USE_EXTERNAL_DHCP_SERVER
+#define IP_SETTING      NULL
+static const wiced_interface_t wiced_network_interface = WICED_STA_INTERFACE;
+#endif
 
 /******************************************************
  *               Function Definitions
  ******************************************************/
 
-void application_start( )
+void ping_start(void)
 {
     /* Init data */
     ping_start_index = 0;
@@ -155,13 +170,13 @@ void application_start( )
     wiced_result_t result;
     uint16_t max_sockets = 10;
     /* Initialise the device */
-    wiced_init( );
+//    wiced_init( );
 
     /* Configure the device */
     /* wiced_configure_device( app_config ); */ /* Config bypassed in local makefile and wifi_config_dct.h */
 
-    /* Bring up the network on the STA interface */
-    result = wiced_network_up( WICED_STA_INTERFACE, WICED_USE_EXTERNAL_DHCP_SERVER, NULL );
+    /* Bring up the network interface */
+    result = wiced_network_up( wiced_network_interface, DHCP_SETTING, IP_SETTING );
 
     if ( result == WICED_SUCCESS )
     {
@@ -171,7 +186,7 @@ void application_start( )
         wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
 
         /* The ping target is the gateway */
-        wiced_ip_get_gateway_address( WICED_STA_INTERFACE, &ping_target_ip );
+        wiced_ip_get_gateway_address( wiced_network_interface, &ping_target_ip );
 
         /* Setup a regular ping event and setup the callback to run in the networking worker thread */
         wiced_rtos_register_timed_event( &ping_timed_event, WICED_NETWORKING_WORKER_THREAD, &send_ping, dct_app->ping_period_ms, 0 );
@@ -198,10 +213,10 @@ void application_start( )
 
 
         /* Start a web server to display ping results */
-        wiced_http_server_start( &http_server, 80, max_sockets, web_pages, WICED_STA_INTERFACE, DEFAULT_URL_PROCESSOR_STACK_SIZE );
+        wiced_http_server_start( &http_server, 80, max_sockets, web_pages, wiced_network_interface, DEFAULT_URL_PROCESSOR_STACK_SIZE );
 
         /* Start Gedday to advertise the webservice */
-        gedday_init(WICED_STA_INTERFACE, "wiced_ping_webserver");
+        gedday_init(wiced_network_interface, "wiced_ping_webserver");
         gedday_add_service("Ping App Webserver", "_http._tcp.local", 80, "");
 
         wiced_dct_read_unlock( dct_app, WICED_FALSE );
@@ -223,7 +238,7 @@ static wiced_result_t send_ping( void* arg )
 
     wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
 
-    status = wiced_ping( WICED_STA_INTERFACE, &ping_target_ip, dct_app->ping_timeout_ms, &elapsed_ms );
+    status = wiced_ping( wiced_network_interface, &ping_target_ip, dct_app->ping_timeout_ms, &elapsed_ms );
 
     wiced_dct_read_unlock( dct_app, WICED_FALSE );
 
