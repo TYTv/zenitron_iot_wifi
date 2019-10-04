@@ -36,12 +36,13 @@
 #include "wiced.h"
 //#include "resources.h"
 //#include "sntp.h"
-#include "command_console.h"
 //#include "wiced_management.h"
 //#include "command_console_ping.h"
 
 #include "PING.h"
 #include "JSON_CMD.h"
+#include "CONSOLE.h"
+
 
 #ifdef __cplusplus
 extern "C" {

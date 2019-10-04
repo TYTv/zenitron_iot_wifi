@@ -36,6 +36,7 @@ $(NAME)_SOURCES    += start.c \
                       PING.c \
                       JSON_CMD.c \
                       frozen.c \
+                      CONSOLE.c \
 
 $(NAME)_COMPONENTS += daemons/HTTP_server \
                       daemons/Gedday \
