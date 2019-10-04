@@ -50,7 +50,7 @@ extern "C" {
 #define PING_THREAD_STACK_SIZE (2500)
 #define PING_DESCRIPTION_LEN    (200)
 #define PING_HISTORY_LEN          (5)
-#define PING_RESULT_LEN          (30)
+#define PING_RESULT_LEN          (50)
 
 /******************************************************
  *                   Enumerations

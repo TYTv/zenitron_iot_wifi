@@ -32,23 +32,38 @@
 
 NAME := zenitron_iot_wifi
 
-$(NAME)_SOURCES    := start.c \
+$(NAME)_SOURCES    += start.c \
                       PING.c \
+                      JSON_CMD.c \
+                      frozen.c \
 
-$(NAME)_COMPONENTS := daemons/HTTP_server \
-                      daemons/Gedday
+$(NAME)_COMPONENTS += daemons/HTTP_server \
+                      daemons/Gedday \
+				      protocols/SNTP
 
-$(NAME)_RESOURCES  := apps/ping_webserver/top.html \
-                      apps/ping_webserver/table.html \
-                      images/cypresslogo.png \
-                      images/cypresslogo_line.png \
-                      images/favicon.ico \
+$(NAME)_COMPONENTS += utilities/command_console \
+                      utilities/command_console/ping
+
+#$(NAME)_COMPONENTS += protocols/Xively
+
+$(NAME)_RESOURCES  += apps/res/index.html \
+                      apps/res/table.html \
+                      apps/res/cypress.jpg \
+                      apps/res/line.png \
+                      apps/res/favicon.ico \
                       scripts/general_ajax_script.js \
-                      scripts/wpad.dat
+                      scripts/wpad.dat \
+                      apps/res/azurewave.png \
+                      apps/res/microchip.png \
+                      apps/res/rohm.jpg \
+                      apps/res/wifi.png \
+                      apps/res/zenitron.gif \
+                      apps/res/jquery-1.8.3.min.js \
+                      apps/res/jquery.flot.min.js \
+                      
+APPLICATION_DCT    += ping_webserver_dct.c
 
-APPLICATION_DCT    := ping_webserver_dct.c
-
-WIFI_CONFIG_DCT_H  := wifi_config_dct.h
+WIFI_CONFIG_DCT_H  += wifi_config_dct.h
 
 ifeq ($(PLATFORM),$(filter $(PLATFORM), CYW9MCU7X9N364))
 GLOBAL_DEFINES += APPLICATION_STACK_SIZE=14*1024

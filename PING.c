@@ -78,6 +78,7 @@
 #include "resources.h"
 #include "ping_webserver_dct.h"
 
+#include "start.h"
 
 /******************************************************
  *                      Macros
@@ -105,6 +106,7 @@
 
 static wiced_result_t send_ping    ( void* arg );
 static int32_t        process_ping ( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data );
+static int32_t        process_json ( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data );
 
 /******************************************************
  *               Variable Definitions
@@ -130,13 +132,21 @@ static const configuration_entry_t const app_config[] =
 #endif /* #ifdef USE_APP_CONFIG */
 
 START_OF_HTTP_PAGE_DATABASE(web_pages)
-    ROOT_HTTP_PAGE_REDIRECT("/apps/ping_webserver/top.html"),
-    { "/apps/ping_webserver/top.html",   "text/html",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_ping_webserver_DIR_top_html, },
+    ROOT_HTTP_PAGE_REDIRECT("/apps/ping_webserver/index.html"),
+    { "/apps/ping_webserver/index.html", "text/html",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_index_html, },
     { "/ping.html",                      "text/html",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_ping, 0 }, },
     { "/scripts/general_ajax_script.js", "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_scripts_DIR_general_ajax_script_js, },
-    { "/images/favicon.ico",             "image/vnd.microsoft.icon", WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_images_DIR_favicon_ico, },
-    { "/images/cypresslogo.png",         "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_images_DIR_cypresslogo_png, },
-    { "/images/cypresslogo_line.png",    "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_images_DIR_cypresslogo_line_png, },
+    { "/images/favicon.ico",             "image/vnd.microsoft.icon", WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_favicon_ico, },
+    { "/images/cypress.jpg",             "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_cypress_jpg, },
+    { "/images/line.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_line_png, },
+    { "/images/azurewave.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_azurewave_png, },
+    { "/images/microchip.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_microchip_png, },
+    { "/images/rohm.jpg",                "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_rohm_jpg, },
+    { "/images/wifi.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_wifi_png, },
+    { "/images/zenitron.gif",            "image/gif",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_zenitron_gif, },
+    { "/scripts/jquery-1.8.3.min.js",    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_8_3_min_js, },
+    { "/scripts/jquery.flot.min.js",     "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_min_js, },
+    { "/buffer.json",                    "text/json",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_json, 0 }, },
 END_OF_HTTP_PAGE_DATABASE();
 
 #if 1   // SOFT AP MODE
@@ -208,7 +218,7 @@ void ping_start(void)
         char* tmp_str = ping_description;
         uint32_t size;
         tmp_str += sprintf( ping_description, "%s", ping_description_raw );
-        resource_read ( &resources_apps_DIR_ping_webserver_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
+        resource_read ( &resources_apps_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
         sprintf( ping_description, "Last %d replies ...", PING_HISTORY_LEN );
 
 
@@ -244,20 +254,26 @@ static wiced_result_t send_ping( void* arg )
 
     wiced_rtos_lock_mutex( &ping_mutex );  /* Stop webserver thread reading ping data halfway through a write */
 
+    uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
+    char ping_ip_number[16];
+    sprintf(ping_ip_number, "%u.%u.%u.%u", (unsigned int)((ipv4 >> 24) & 0xFF),
+                                           (unsigned int)((ipv4 >> 16) & 0xFF),
+                                           (unsigned int)((ipv4 >>  8) & 0xFF),
+                                           (unsigned int)((ipv4 >>  0) & 0xFF));
     if ( status == WICED_SUCCESS )
     {
-        WPRINT_APP_INFO(("Ping Reply : %lu ms\n", (unsigned long)elapsed_ms ));
-        sprintf( (char*) ping_results[ping_end_index], "Ping reply : %5ld ms", (long)elapsed_ms );
+        WPRINT_APP_INFO(("Ping %s Reply : %lu ms\n", ping_ip_number, (unsigned long)elapsed_ms ));
+        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : %5ld ms", ping_ip_number, (long)elapsed_ms );
     }
     else if ( status == WICED_TIMEOUT )
     {
-        WPRINT_APP_INFO(("Ping timeout\n"));
-        sprintf( (char*) ping_results[ping_end_index], "Ping reply : timeout" );
+        WPRINT_APP_INFO(("Ping %s timeout\n", ping_ip_number));
+        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : timeout", ping_ip_number );
     }
     else
     {
-        WPRINT_APP_INFO(("Ping error\n"));
-        sprintf( (char*) ping_results[ping_end_index], "Ping error" );
+        WPRINT_APP_INFO(("Ping %s error\n", ping_ip_number));
+        sprintf( (char*) ping_results[ping_end_index], "Ping %s error", ping_ip_number );
     }
 
     ping_end_index = ( ping_end_index + 1 ) % PING_HISTORY_LEN;
@@ -276,20 +292,47 @@ static int32_t process_ping( const char* url_path, const char* url_parameters, w
     UNUSED_PARAMETER( url_path );
     UNUSED_PARAMETER( http_data );
 
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_ping_webserver_DIR_table_html );
+    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
     wiced_http_response_stream_write( stream, ping_description, strlen( ping_description ) );
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_ping_webserver_DIR_table_html_desc2_end );
+    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_desc2_end );
 
     wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
     for ( a = PING_HISTORY_LEN - 1; a >= 0; a-- )
     {
         char* res = ping_results[( ping_start_index + a ) % PING_HISTORY_LEN];
         wiced_http_response_stream_write( stream, res, strlen(res) );
-        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_ping_webserver_DIR_table_html_row_end );
+        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
     }
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_ping_webserver_DIR_table_html_list_end );
+    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
     wiced_rtos_unlock_mutex( &ping_mutex );
     return 0;
 }
 
+static int32_t process_json( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
+{
 
+    UNUSED_PARAMETER( url_path );
+    UNUSED_PARAMETER( url_parameters );
+    UNUSED_PARAMETER( arg );
+    UNUSED_PARAMETER( http_data );
+
+    wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
+
+    uint8_t tmp[rawsiz*datnum] = "";
+    for(uint32_t i=0;i<datnum;i++){
+        if( strlen( json_data[i].list ) > 0 ){
+            if( strlen(tmp) <= 0 ){
+                strcat(tmp,"[");
+            }else{
+                strcat(tmp,",");
+            }
+            strcat( tmp, json_data[i].raw );
+        }
+    }
+    strcat(tmp,"]");
+
+    wiced_http_response_stream_write( stream, (const void*)&tmp, strlen( tmp ) );
+
+    wiced_rtos_unlock_mutex( &ping_mutex );
+
+}
