@@ -1,0 +1,19 @@
+<html>
+<head>
+ <title></title>
+ <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+ <script>
+
+  jQuery.getJSON('../../buffer.json',
+   function (data) {
+    alert(JSON.stringify(data));
+    alert(data.BM1383GLV(hPa));
+    alert(data.BH1749_RED);
+   });
+ </script>
+
+
+</head>
+<body>
+</body>
+</html>
