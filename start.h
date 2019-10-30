@@ -39,7 +39,7 @@
 //#include "wiced_management.h"
 //#include "command_console_ping.h"
 
-#include "PING.h"
+#include "WEB.h"
 #include "JSON_CMD.h"
 #include "CONSOLE.h"
 

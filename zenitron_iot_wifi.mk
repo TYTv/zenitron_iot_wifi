@@ -33,7 +33,7 @@
 NAME := zenitron_iot_wifi
 
 $(NAME)_SOURCES    += start.c \
-                      PING.c \
+                      WEB.c \
                       JSON_CMD.c \
                       frozen.c \
                       CONSOLE.c \
@@ -47,7 +47,21 @@ $(NAME)_COMPONENTS += utilities/command_console \
 
 #$(NAME)_COMPONENTS += protocols/Xively
 
-$(NAME)_RESOURCES  += apps/res/index.html \
+$(NAME)_RESOURCES  += ../apps/work/zenitron_iot_wifi/res/index.html \
+                      ../apps/work/zenitron_iot_wifi/res/table.html \
+                      ../apps/work/zenitron_iot_wifi/res/cypress.jpg \
+                      ../apps/work/zenitron_iot_wifi/res/line.png \
+                      ../apps/work/zenitron_iot_wifi/res/favicon.ico \
+                      ../apps/work/zenitron_iot_wifi/res/azurewave.png \
+                      ../apps/work/zenitron_iot_wifi/res/microchip.png \
+                      ../apps/work/zenitron_iot_wifi/res/rohm.jpg \
+                      ../apps/work/zenitron_iot_wifi/res/wifi.png \
+                      ../apps/work/zenitron_iot_wifi/res/zenitron.gif \
+                      ../apps/work/zenitron_iot_wifi/res/jquery.flot.min.js \
+					  ../apps/work/zenitron_iot_wifi/res/jquery-1.12.4.min.js \
+					  ../apps/work/zenitron_iot_wifi/res/highcharts.js
+
+#$(NAME)_RESOURCES  += apps/res/index.html \
                       apps/res/table.html \
                       apps/res/cypress.jpg \
                       apps/res/line.png \
@@ -61,16 +75,7 @@ $(NAME)_RESOURCES  += apps/res/index.html \
                       apps/res/jquery.flot.min.js \
                       scripts/general_ajax_script.js \
 					  apps/res/jquery-1.12.4.min.js \
-					  apps/res/highcharts.js \					  
-
-                      
-#$(NAME)_RESOURCES  += apps/res/jquery.flot.time.js \
-                      apps/res/jquery.flot.symbol.js \
-                      apps/res/jquery.flot.axislabels.js \
-                      apps/res/jquery.numberformatter-1.2.3.min.js \
-					  apps/res/jshashtable-2.1.js \
-					  apps/res/jquery-1.10.2.js \
-					  apps/res/jquery-1.8.3.min.js \         
+					  ../apps/work/zenitron_iot_wifi/res/highcharts.js
 
 APPLICATION_DCT    += ping_webserver_dct.c
 

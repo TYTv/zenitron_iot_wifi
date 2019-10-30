@@ -71,7 +71,7 @@ extern "C" {
 /******************************************************
  *               Function Declarations
  ******************************************************/
-void ping_start(void);
+void web_start(void);
 
 #ifdef __cplusplus
 } /*extern "C" */

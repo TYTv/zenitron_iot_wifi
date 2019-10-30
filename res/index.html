@@ -21,7 +21,7 @@
     </style>
     <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="http://www.pureexample.com/js/flot/excanvas.min.js"></script><![endif]-->
 
-    <script type="text/javascript" src="../../scripts/general_ajax_script.js"></script>
+    <!-- <script type="text/javascript" src="../../scripts/general_ajax_script.js"></script> -->
     <script type="text/javascript" src="../../scripts/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="../../scripts/jquery.flot.min.js"></script>
     <script type="text/javascript" src="../../scripts/highcharts.js"></script>
@@ -65,7 +65,7 @@
                         
                         setInterval(function () {
 
-                            jQuery.getJSON('../../buffer.json',
+                            jQuery.getJSON('/buffer.json',
                               function (buf) {
 
                                 var r_key = [];

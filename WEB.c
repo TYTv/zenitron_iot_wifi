@@ -71,7 +71,7 @@
  */
 
 #include "wiced.h"
-#include "PING.h"
+#include "WEB.h"
 #include "http_server.h"
 #include "gedday.h"
 #include "wiced_resource.h"
@@ -132,29 +132,21 @@ static const configuration_entry_t const app_config[] =
 #endif /* #ifdef USE_APP_CONFIG */
 
 START_OF_HTTP_PAGE_DATABASE(web_pages)
-    ROOT_HTTP_PAGE_REDIRECT("/apps/ping_webserver/index.html"),
-    { "/apps/ping_webserver/index.html", "text/html",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_index_html, },
-    { "/ping.html",                      "text/html",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_ping, 0 }, },
-    { "/scripts/general_ajax_script.js", "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_scripts_DIR_general_ajax_script_js, },
-    { "/images/favicon.ico",             "image/vnd.microsoft.icon", WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_favicon_ico, },
-    { "/images/cypress.jpg",             "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_cypress_jpg, },
-    { "/images/line.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_line_png, },
-    { "/images/azurewave.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_azurewave_png, },
-    { "/images/microchip.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_microchip_png, },
-    { "/images/rohm.jpg",                "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_rohm_jpg, },
-    { "/images/wifi.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_wifi_png, },
-    { "/images/zenitron.gif",            "image/gif",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_zenitron_gif, },
-//    { "/scripts/jquery-1.8.3.min.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_8_3_min_js, },
-//    { "/scripts/jquery-1.10.2.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_10_2_js, },
-    { "/scripts/jquery-1.12.4.min.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_12_4_min_js, },
-    { "/scripts/jquery.flot.min.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_min_js, },
-//    { "/scripts/jquery.flot.time.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_time_js, },
-//    { "/scripts/jquery.flot.symbol.js",                 "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_symbol_js, },
-//    { "/scripts/jquery.flot.axislabels.js",             "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_axislabels_js, },
-//    { "/scripts/jshashtable-2.1.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jshashtable_2_1_js, },
-    { "/scripts/highcharts.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_highcharts_js, },
-//    { "/scripts/jquery.numberformatter-1.2.3.min.js",   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_numberformatter_1_2_3_min_js, },
-    { "/buffer.json",                                   "text/json",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_json, 0 }, },
+    ROOT_HTTP_PAGE_REDIRECT("/index.html"),
+    { "/index.html",                     "text/html",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_index_html, },
+    { "/images/favicon.ico",             "image/vnd.microsoft.icon", WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_favicon_ico, },
+    { "/images/cypress.jpg",             "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_cypress_jpg, },
+    { "/images/line.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_line_png, },
+    { "/images/azurewave.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_azurewave_png, },
+    { "/images/microchip.png",           "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_microchip_png, },
+    { "/images/rohm.jpg",                "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_rohm_jpg, },
+    { "/images/wifi.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_wifi_png, },
+    { "/images/zenitron.gif",            "image/gif",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_zenitron_gif, },
+    { "/scripts/jquery-1.12.4.min.js",   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_jquery_1_12_4_min_js, },
+    { "/scripts/jquery.flot.min.js",     "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_jquery_flot_min_js, },
+    { "/scripts/highcharts.js",          "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_highcharts_js, },
+    { "/buffer.json",                    "text/json",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_json, 0 }, },
+//    { "/ping.html",                      "text/html",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_ping, 0 }, },
 END_OF_HTTP_PAGE_DATABASE();
 
 #if 1   // SOFT AP MODE
@@ -177,7 +169,7 @@ static const wiced_interface_t wiced_network_interface = WICED_STA_INTERFACE;
  *               Function Definitions
  ******************************************************/
 
-void ping_start(void)
+void web_start(void)
 {
     /* Init data */
     ping_start_index = 0;
@@ -226,7 +218,8 @@ void ping_start(void)
         char* tmp_str = ping_description;
         uint32_t size;
         tmp_str += sprintf( ping_description, "%s", ping_description_raw );
-        resource_read ( &resources_apps_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
+//        resource_read ( &resources_apps_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
+        resource_read ( &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
         sprintf( ping_description, "Last %d replies ...", PING_HISTORY_LEN );
 
 
@@ -300,18 +293,22 @@ static int32_t process_ping( const char* url_path, const char* url_parameters, w
     UNUSED_PARAMETER( url_path );
     UNUSED_PARAMETER( http_data );
 
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
+//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
+    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html );
     wiced_http_response_stream_write( stream, ping_description, strlen( ping_description ) );
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_desc2_end );
+//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_desc2_end );
+    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc2_end );
 
     wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
     for ( a = PING_HISTORY_LEN - 1; a >= 0; a-- )
     {
         char* res = ping_results[( ping_start_index + a ) % PING_HISTORY_LEN];
         wiced_http_response_stream_write( stream, res, strlen(res) );
-        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
+//        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
+        wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_row_end );
     }
-    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
+//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
+    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_list_end );
     wiced_rtos_unlock_mutex( &ping_mutex );
     return 0;
 }
