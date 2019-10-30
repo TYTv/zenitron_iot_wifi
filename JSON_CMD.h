@@ -1,9 +1,9 @@
 #include "wiced.h"
 #include "frozen.h"
 
-#define rawsiz  512     // json raw data buffer sizes
-#define toknum  20      // number of token
-#define datnum  10      // number of data
+#define rawsiz  128     // json raw data buffer sizes
+#define toknum  10      // number of token
+#define datnum  8      // number of data
 
 typedef struct{
     uint8_t raw[rawsiz];

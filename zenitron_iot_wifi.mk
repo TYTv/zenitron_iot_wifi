@@ -52,16 +52,26 @@ $(NAME)_RESOURCES  += apps/res/index.html \
                       apps/res/cypress.jpg \
                       apps/res/line.png \
                       apps/res/favicon.ico \
-                      scripts/general_ajax_script.js \
                       scripts/wpad.dat \
                       apps/res/azurewave.png \
                       apps/res/microchip.png \
                       apps/res/rohm.jpg \
                       apps/res/wifi.png \
                       apps/res/zenitron.gif \
-                      apps/res/jquery-1.8.3.min.js \
                       apps/res/jquery.flot.min.js \
+                      scripts/general_ajax_script.js \
+					  apps/res/jquery-1.12.4.min.js \
+					  apps/res/highcharts.js \					  
+
                       
+#$(NAME)_RESOURCES  += apps/res/jquery.flot.time.js \
+                      apps/res/jquery.flot.symbol.js \
+                      apps/res/jquery.flot.axislabels.js \
+                      apps/res/jquery.numberformatter-1.2.3.min.js \
+					  apps/res/jshashtable-2.1.js \
+					  apps/res/jquery-1.10.2.js \
+					  apps/res/jquery-1.8.3.min.js \         
+
 APPLICATION_DCT    += ping_webserver_dct.c
 
 WIFI_CONFIG_DCT_H  += wifi_config_dct.h

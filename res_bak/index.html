@@ -20,10 +20,195 @@
       #flot-placeholder{width:350px;height:300px;}        
     </style>
     <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="http://www.pureexample.com/js/flot/excanvas.min.js"></script><![endif]-->
-    <script type="text/javascript" src="../../scripts/jquery-1.8.3.min.js"></script>
+
+    <script type="text/javascript" src="../../scripts/general_ajax_script.js"></script>
+    <script type="text/javascript" src="../../scripts/jquery-1.12.4.min.js"></script>
     <script type="text/javascript" src="../../scripts/jquery.flot.min.js"></script>
-    <script src="../../scripts/general_ajax_script.js" type="text/javascript" ></script>
+    <script type="text/javascript" src="../../scripts/highcharts.js"></script>
     <script type="text/javascript">
+
+
+
+      var DSPCHT;
+
+      function tmline(tm) {
+        var tml = [];
+        // var tm = (new Date()).getTime();
+        for (var i = -39; i <= 0; i += 1) {
+          tml.push({
+          x: tm + i * 500,
+          });
+        }
+        return tml;
+      }
+
+      var raw_key = [];
+      var raw_val = [];
+      var raw_show = [];
+
+
+      $(function (){
+        DSPCHT = Highcharts.chart('container', {
+
+          chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+        
+                        // set up the updating of the chart each second
+                        // var series = this.series[0];
+                        var series = this.series;
+                        var x = 0;
+                        var y = 0;
+                        
+                        setInterval(function () {
+
+                            jQuery.getJSON('../../buffer.json',
+                              function (buf) {
+
+                                var r_key = [];
+                                var r_val = [];
+                                var r_num = 0;
+                                $.each(buf, function(key, value){
+                                  $.each(value, function(key, value){
+
+                                    r_key[r_num] = key;
+                                    r_val[r_num] = value;
+
+                                    r_num++;
+
+                                  });
+                                });
+
+                                raw_key = r_key;
+                                raw_val = r_val;
+
+                                // var tim = (new Date()).getTime(); // current time
+                                // for(var i=0; i<raw_key.length; i++){
+                                //   series[i].addPoint([tim, raw_val[i]], true, true);
+                                //   series[i].setName(raw_key[i]);
+                                // }
+                                
+                                // var tim = (new Date()).getTime(); // current time
+                                // for(var i=0; i<raw_key.length; i++){
+                                //   var show_sel = document.getElementById(raw_key[i]).style.backgroundColor;
+                                //   if( show_sel == "yellow" ){
+                                //     series[i].addPoint([tim, raw_val[i]], true, true);
+                                //     series[i].setName(raw_key[i]);
+                                //   }
+                                // }
+
+
+                            });
+
+                            // var show_num = 0;
+                            // for( var i = 0 ; i < raw_key.length ; i++ ){
+                            //   if(document.getElementById(raw_key[i]).style.backgroundColor=="yellow"){
+                            //     show_num++;
+                            //   }
+                            // }
+                            // while(DSPCHT.series.length<show_num){
+                            //   IncrementLine();
+                            // }
+
+                            var tim = (new Date()).getTime(); // current time
+                            while( DSPCHT.series.length < raw_key.length ){
+                              IncrementLine(tim);
+                            }
+
+                            // for( var i = 0 ; i < raw_key.length ; i++ ){
+                            //   document.getElementById(raw_key[i]).style.backgroundColor = "yellow";
+                            // }
+
+                            var i = 0;
+                            while( raw_key[i] != null ){
+                              var text = document.getElementById(raw_key[i]).firstChild;
+                              var s = "";
+                              s += raw_key[i];
+                              s += " : ";
+                              s += raw_val[i];
+                              text.data = s;
+
+                              // var show_sel = document.getElementById(raw_key[i]).style.backgroundColor;
+                              // if( show_sel == "yellow" ){
+                                series[i].setName(raw_key[i]);
+                                series[i].addPoint([tim, raw_val[i]], true, true);
+                              // }
+
+                              i++;
+                            }
+
+                            // x = (new Date()).getTime(); // current time
+
+                            // y = raw_val[4];
+                            // y = Math.random();
+                            // series.addPoint([x, raw_val[4]], true, true);
+                            // series.setName(raw_key[4]);
+                
+                            // series[0].addPoint([x, raw_val[4]], true, true);
+                            // series[0].setName(raw_key[4]);
+                            // series[1].addPoint([x, raw_val[5]], true, true);
+                            // series[1].setName(raw_key[5]);
+
+                        }, 500);
+                    }
+                }
+            },
+        
+            time: {
+                useUTC: false
+            },
+        
+            title: {
+                text: 'Live data'
+            },
+
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+
+            yAxis: {
+                title: {
+                    text: 'Value'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            
+            tooltip: {
+                headerFormat: '<b>{series.name}</b><br/>',
+                pointFormat: '{point.x:%Y-%m-%d %H:%M:%S}<br/>{point.y:.2f}'
+            },
+            
+            legend: {
+                enabled: false
+            },
+            
+            exporting: {
+                enabled: false
+            },
+
+            // series: [{
+            //   data: tmline()
+            // }]
+
+        });
+      });
+
+
+
+
+
+
+
+
+
 
       // var data = [[1, 130], [2, 40], [3, 80], [4, 160], [5, 159], [6, 370], [7, 330], [8, 350], [9, 370], [10, 400], [11, 330], [12, 350]];
       var data = [];
@@ -32,33 +217,34 @@
       /* <![CDATA[ */
       function reloadData( )
       {
-        do_ajax( '/ping.html', ajax_handler);
+        // do_ajax( '/ping.html', ajax_handler);
+        do_ajax( '/buffer.json', ajax_handler);
 
         // read file
-        jQuery.getJSON('../../buffer.json',
-          function (buf) {
-            // alert(JSON.stringify(data));
-            // alert(data.BM1383GLV(hPa));
-            // alert(data.BH1749_RED);
+        // jQuery.getJSON('../../buffer.json',
+        //   function (buf) {
+        //     // alert(JSON.stringify(data));
+        //     // alert(data.BM1383GLV(hPa));
+        //     // alert(data.BH1749_RED);
 
-            $.each(buf, function(key, value){
-              $.each(value, function(key, value){
-                console.log(key, value);
+        //     $.each(buf, function(key, value){
+        //       $.each(value, function(key, value){
+        //         console.log(key, value);
 
-                var tmp = [sn,value];
-                sn = sn + 1;
-                data.push(tmp);
+        //         var tmp = [sn,value];
+        //         sn = sn + 1;
+        //         data.push(tmp);
                 
-                // tmp = [2,value];
-                // data.push(tmp);
-              });
-            });
+        //         // tmp = [2,value];
+        //         // data.push(tmp);
+        //       });
+        //     });
 
-            // for (var key in buf) { 
-            //   console.log(key, buf[key])
-            // }
+        //     // for (var key in buf) { 
+        //     //   console.log(key, buf[key])
+        //     // }
 
-        });
+        // });
 
 
         var dataset = [{label: "line1",data: data}];
@@ -109,11 +295,132 @@
 
 
       // button
-      $("button").click(function(){
+      // $("button").click(function(){
+      // $('#button').click(function () {
 
 
 
-      });
+      //   // if (DSPCHT.series.length === 1) {
+      //     // DSPCHT.addSeries({
+      //     //     data: tmline
+      //     //     // data: [194.1, 95.6, 54.4, 29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4]
+      //     // });
+      //   // }
+      //   console.log(tmline);
+
+
+      // });
+
+
+
+        function IncrementLine(tm) {
+          // if (DSPCHT.series.length <= 5) {
+            DSPCHT.addSeries({
+                data: tmline(tm)
+                // data: [194.1, 95.6, 54.4, 29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4]
+            });
+          // }
+
+          if(DSPCHT.series.length>0){
+            // init button text
+            var s = "";
+            s += raw_key[DSPCHT.series.length-1];
+            s += " : ";
+            s += raw_val[DSPCHT.series.length-1];
+            ADD( raw_key[DSPCHT.series.length-1], s );
+            
+            // init line to hide
+            DSPCHT.series[DSPCHT.series.length-1].hide();
+          }
+        
+        }
+
+        function DecrementLine() {
+          var len = DSPCHT.series.length;
+          if (len >= 1) {
+            DSPCHT.series[len-1].remove();
+          }
+        }
+
+        function toggleText(button_id)  {
+          var text = document.getElementById(button_id).firstChild;
+          text.data = text.data == "[Hide]" ? "[Show]" : "[Hide]";
+        }
+
+        function Btn_Reflash(){
+          // var i = 0;
+          // while( raw_key[i] != null ){
+          //   var s = "";
+          //   s += raw_key[i];
+          //   s += " : ";
+          //   s += raw_val[i];
+          //   ADD( raw_key[i], s );
+
+          //   // IncrementLine();
+          //   i++;
+          // }
+        }
+
+
+      // $(function (){
+      function ADD( btn_id, btn_text )  {
+
+        // $('btn').addEventListener('click',function(){
+
+				//建立DIV
+				var fileItem = document.createElement('div');
+				fileItem.className = 'file-item';
+				
+				// //建立input元素，type為file,name為file
+				// var input = document.createElement('input');
+				// input.type = input.name = 'file';
+				// fileItem.appendChild(input);
+				
+				//建立按鈕
+        var btn = document.createElement('button');
+        btn.setAttribute("id", btn_id);
+        btn.setAttribute("style", "background-color: silver;");
+        // btn.textContent = '刪除';
+        btn.textContent = btn_text;
+				fileItem.appendChild(btn);
+				$('file-box').appendChild(fileItem);
+				
+				//為按鈕設定點選事件(刪除)
+				btn.addEventListener('click',function(){
+					//刪除當前按鈕節點所在父節點
+					// $('file-box').removeChild(this.parentNode);
+          // this.parentNode.remove();
+
+
+          if( document.getElementById(this.id).style.backgroundColor == "silver" ){
+            document.getElementById(this.id).style.backgroundColor = "yellow";
+          }else{
+            document.getElementById(this.id).style.backgroundColor = "silver";
+          }
+          for(var i=0;i<raw_key.length;i++){
+            if(raw_key[i]==this.id){
+              if(document.getElementById(this.id).style.backgroundColor=="yellow"){
+                DSPCHT.series[i].show();
+              }else{
+                DSPCHT.series[i].hide();
+              }
+            }
+          }
+
+				})
+        
+      // });
+
+			
+			function $(id){
+				return document.getElementById(id);
+      }
+    
+    }
+    // });
+
+
+
 
     </script>
 
@@ -152,7 +459,7 @@
     </table>
 
     <!-- plot display -->
-    <div id="flot-placeholder"></div>
+    <!-- <div id="flot-placeholder"></div>
     <div id="result"></div>
     <script>
       if(typeof(EventSource) !== "undefined") {
@@ -166,15 +473,33 @@
       {
         document.getElementById("result").innerHTML = "Sorry, your browser does not support server-sent events...";
       }
-    </script>
+    </script> -->
 
-    <!-- data display -->
-    <div style="margin-left:20px" id="currentData" >
-      <p>Retrieving ping status...</p>
-    </div>
+
+    <div id="container"></div>
+
+
 
     <!-- button -->
-    <button>Refresh</button>
+    <!-- <button>Refresh</button> -->
+    <!-- <button id="BTN0" onclick="IncrementLine(); toggleText(this.id);">＋</button>
+    <button id="BTN1" onclick="DecrementLine(); toggleText(this.id);">－</button>
+    <button id="BTN_REFLASH" onclick=Btn_Reflash()>Reflash</button> -->
+
+		<!-- <h1>Data List</h1> -->
+    <!-- <input type="file" name="file" /> -->
+    <!-- <button id='btn'>add more...</button> -->
+		<div id="file-box"></div>
+		
+
+
+    <!-- raw data display -->
+    <div style="margin-left:20px" id="currentData" >
+      <!-- <p>Retrieving ping status...</p> -->
+    </div>
+
+
+    
 
   </body>
 

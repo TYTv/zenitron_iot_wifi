@@ -144,9 +144,17 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
     { "/images/rohm.jpg",                "image/jpg",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_rohm_jpg, },
     { "/images/wifi.png",                "image/png",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_wifi_png, },
     { "/images/zenitron.gif",            "image/gif",                WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_zenitron_gif, },
-    { "/scripts/jquery-1.8.3.min.js",    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_8_3_min_js, },
-    { "/scripts/jquery.flot.min.js",     "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_min_js, },
-    { "/buffer.json",                    "text/json",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_json, 0 }, },
+//    { "/scripts/jquery-1.8.3.min.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_8_3_min_js, },
+//    { "/scripts/jquery-1.10.2.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_10_2_js, },
+    { "/scripts/jquery-1.12.4.min.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_1_12_4_min_js, },
+    { "/scripts/jquery.flot.min.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_min_js, },
+//    { "/scripts/jquery.flot.time.js",                   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_time_js, },
+//    { "/scripts/jquery.flot.symbol.js",                 "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_symbol_js, },
+//    { "/scripts/jquery.flot.axislabels.js",             "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_flot_axislabels_js, },
+//    { "/scripts/jshashtable-2.1.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jshashtable_2_1_js, },
+    { "/scripts/highcharts.js",                    "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_highcharts_js, },
+//    { "/scripts/jquery.numberformatter-1.2.3.min.js",   "application/javascript",   WICED_RESOURCE_URL_CONTENT,  .url_content.resource_data  = &resources_apps_DIR_res_DIR_jquery_numberformatter_1_2_3_min_js, },
+    { "/buffer.json",                                   "text/json",                WICED_DYNAMIC_URL_CONTENT,   .url_content.dynamic_data   = { process_json, 0 }, },
 END_OF_HTTP_PAGE_DATABASE();
 
 #if 1   // SOFT AP MODE
@@ -199,7 +207,7 @@ void ping_start(void)
         wiced_ip_get_gateway_address( wiced_network_interface, &ping_target_ip );
 
         /* Setup a regular ping event and setup the callback to run in the networking worker thread */
-        wiced_rtos_register_timed_event( &ping_timed_event, WICED_NETWORKING_WORKER_THREAD, &send_ping, dct_app->ping_period_ms, 0 );
+//        wiced_rtos_register_timed_event( &ping_timed_event, WICED_NETWORKING_WORKER_THREAD, &send_ping, dct_app->ping_period_ms, 0 );
 
         uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
 
@@ -329,10 +337,39 @@ static int32_t process_json( const char* url_path, const char* url_parameters, w
             strcat( tmp, json_data[i].raw );
         }
     }
-    strcat(tmp,"]");
+    if( strlen(tmp) > 0 ){
+        strcat(tmp,"]");
+    }
 
     wiced_http_response_stream_write( stream, (const void*)&tmp, strlen( tmp ) );
 
     wiced_rtos_unlock_mutex( &ping_mutex );
-
+    return 0;
 }
+
+
+//static int32_t process_json( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
+//{
+//    UNUSED_PARAMETER( url_path );
+//    UNUSED_PARAMETER( http_data );
+//
+//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
+//
+//    wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
+//
+//
+//    for(uint32_t i=0;i<toknum;i++){
+//        if( strlen( json_data[i].list ) > 0 ){
+//            uint8_t tmp[rawsiz] = "";
+//            strcat( tmp, json_data[i].raw );
+//
+//            wiced_http_response_stream_write( stream, tmp, strlen(tmp) );
+//            wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
+//        }
+//    }
+//
+//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
+//    wiced_rtos_unlock_mutex( &ping_mutex );
+//    return 0;
+//}
+
