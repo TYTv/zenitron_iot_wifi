@@ -14,11 +14,6 @@
 
 
 
-
-    <!-- plot -->
-    <style type="text/css">
-      #flot-placeholder{width:350px;height:300px;}        
-    </style>
     <!--[if lte IE 8]><script language="javascript" type="text/javascript" src="http://www.pureexample.com/js/flot/excanvas.min.js"></script><![endif]-->
 
     <!-- <script type="text/javascript" src="../../scripts/general_ajax_script.js"></script> -->
@@ -30,22 +25,78 @@
 
 
       var DSPCHT;
+      var CNT;
+
+      var raw_key = [];
+      var raw_val = [];
+      var raw_show = [];
+
+      function DATASPEED(){
+        return parseInt(document.getElementById("TXT_SPD_VAL").value);
+      }
 
       function tmline(tm) {
         var tml = [];
         // var tm = (new Date()).getTime();
         for (var i = -39; i <= 0; i += 1) {
           tml.push({
-          x: tm + i * 500,
+          x: tm + i * DATASPEED(),
           });
         }
         return tml;
       }
 
-      var raw_key = [];
-      var raw_val = [];
-      var raw_show = [];
+      function GETRAW(){
 
+        CNT = setTimeout( function () {GETRAW()}, DATASPEED() );
+                  
+        jQuery.getJSON('/buffer.json',
+        function (buf) {
+                            
+          var r_key = [];
+          var r_val = [];
+          var r_num = 0;
+          $.each(buf, function(key, value){
+            $.each(value, function(key, value){
+                                
+              r_key[r_num] = key;
+              r_val[r_num] = value;
+                                  
+              r_num++;
+                              
+            });
+          });
+                              
+          raw_key = r_key;
+          raw_val = r_val;
+                              
+        });
+                            
+                            
+        var tim = (new Date()).getTime(); // current time
+        while( DSPCHT.series.length < raw_key.length ){
+          IncrementLine(tim);
+        }
+                            
+        var i = 0;
+        while( raw_key[i] != null ){
+          var text = document.getElementById(raw_key[i]).firstChild;
+          var s = "";
+          s += raw_key[i];
+          s += " : ";
+          s += raw_val[i];
+          text.data = s;
+                      
+          // var show_sel = document.getElementById(raw_key[i]).style.backgroundColor;
+          // if( show_sel == "yellow" ){
+          DSPCHT.series[i].setName(raw_key[i]);
+          DSPCHT.series[i].addPoint([tim, raw_val[i]], true, true);
+          // }
+                              
+          i++;
+        }
+
+      }
 
       $(function (){
         DSPCHT = Highcharts.chart('container', {
@@ -56,103 +107,7 @@
                 marginRight: 10,
                 events: {
                     load: function () {
-        
-                        // set up the updating of the chart each second
-                        // var series = this.series[0];
-                        var series = this.series;
-                        var x = 0;
-                        var y = 0;
-                        
-                        setInterval(function () {
-
-                            jQuery.getJSON('/buffer.json',
-                              function (buf) {
-
-                                var r_key = [];
-                                var r_val = [];
-                                var r_num = 0;
-                                $.each(buf, function(key, value){
-                                  $.each(value, function(key, value){
-
-                                    r_key[r_num] = key;
-                                    r_val[r_num] = value;
-
-                                    r_num++;
-
-                                  });
-                                });
-
-                                raw_key = r_key;
-                                raw_val = r_val;
-
-                                // var tim = (new Date()).getTime(); // current time
-                                // for(var i=0; i<raw_key.length; i++){
-                                //   series[i].addPoint([tim, raw_val[i]], true, true);
-                                //   series[i].setName(raw_key[i]);
-                                // }
-                                
-                                // var tim = (new Date()).getTime(); // current time
-                                // for(var i=0; i<raw_key.length; i++){
-                                //   var show_sel = document.getElementById(raw_key[i]).style.backgroundColor;
-                                //   if( show_sel == "yellow" ){
-                                //     series[i].addPoint([tim, raw_val[i]], true, true);
-                                //     series[i].setName(raw_key[i]);
-                                //   }
-                                // }
-
-
-                            });
-
-                            // var show_num = 0;
-                            // for( var i = 0 ; i < raw_key.length ; i++ ){
-                            //   if(document.getElementById(raw_key[i]).style.backgroundColor=="yellow"){
-                            //     show_num++;
-                            //   }
-                            // }
-                            // while(DSPCHT.series.length<show_num){
-                            //   IncrementLine();
-                            // }
-
-                            var tim = (new Date()).getTime(); // current time
-                            while( DSPCHT.series.length < raw_key.length ){
-                              IncrementLine(tim);
-                            }
-
-                            // for( var i = 0 ; i < raw_key.length ; i++ ){
-                            //   document.getElementById(raw_key[i]).style.backgroundColor = "yellow";
-                            // }
-
-                            var i = 0;
-                            while( raw_key[i] != null ){
-                              var text = document.getElementById(raw_key[i]).firstChild;
-                              var s = "";
-                              s += raw_key[i];
-                              s += " : ";
-                              s += raw_val[i];
-                              text.data = s;
-
-                              // var show_sel = document.getElementById(raw_key[i]).style.backgroundColor;
-                              // if( show_sel == "yellow" ){
-                                series[i].setName(raw_key[i]);
-                                series[i].addPoint([tim, raw_val[i]], true, true);
-                              // }
-
-                              i++;
-                            }
-
-                            // x = (new Date()).getTime(); // current time
-
-                            // y = raw_val[4];
-                            // y = Math.random();
-                            // series.addPoint([x, raw_val[4]], true, true);
-                            // series.setName(raw_key[4]);
-                
-                            // series[0].addPoint([x, raw_val[4]], true, true);
-                            // series[0].setName(raw_key[4]);
-                            // series[1].addPoint([x, raw_val[5]], true, true);
-                            // series[1].setName(raw_key[5]);
-
-                        }, 500);
+                      CNT = setTimeout( function () {GETRAW()}, DATASPEED() );
                     }
                 }
             },
@@ -210,96 +165,9 @@
 
 
 
-      // var data = [[1, 130], [2, 40], [3, 80], [4, 160], [5, 159], [6, 370], [7, 330], [8, 350], [9, 370], [10, 400], [11, 330], [12, 350]];
-      var data = [];
-      var sn = 1;
-
-      /* <![CDATA[ */
-      function reloadData( )
-      {
-        // do_ajax( '/ping.html', ajax_handler);
-        do_ajax( '/buffer.json', ajax_handler);
-
-        // read file
-        // jQuery.getJSON('../../buffer.json',
-        //   function (buf) {
-        //     // alert(JSON.stringify(data));
-        //     // alert(data.BM1383GLV(hPa));
-        //     // alert(data.BH1749_RED);
-
-        //     $.each(buf, function(key, value){
-        //       $.each(value, function(key, value){
-        //         console.log(key, value);
-
-        //         var tmp = [sn,value];
-        //         sn = sn + 1;
-        //         data.push(tmp);
-                
-        //         // tmp = [2,value];
-        //         // data.push(tmp);
-        //       });
-        //     });
-
-        //     // for (var key in buf) { 
-        //     //   console.log(key, buf[key])
-        //     // }
-
-        // });
-
-
-        var dataset = [{label: "line1",data: data}];
-        var options = {
-            series: {
-                lines: { show: true },
-                points: {
-                    radius: 3,
-                    show: true
-                }
-            }
-        };
-        $(document).ready(function () {
-            $.plot($("#flot-placeholder"), dataset, options);
-        });
-
-
-
-      }
-      function ajax_handler( result, data )
-      {
-        var text = "";
-        switch( result )
-        {
-            case AJAX_PARTIAL_PROGRESS:
-            case AJAX_STARTING:
-                break;
-            case AJAX_FINISHED:
-                document.getElementById("currentData").innerHTML = data;
-                timeoutID = setTimeout('reloadData()', 1000);
-                break;
-            case AJAX_NO_BROWSER_SUPPORT:
-                document.getElementById("currentData").innerHTML = "Failed - your browser does not support this script";
-                break;
-            case AJAX_FAILED:
-                document.getElementById("currentData").innerHTML = "There was a problem retrieving ping data";
-                break;
-        }
-      }
-      /* ]]> */
-
-
-
-
-
-
-
-
-
       // button
       // $("button").click(function(){
       // $('#button').click(function () {
-
-
-
       //   // if (DSPCHT.series.length === 1) {
       //     // DSPCHT.addSeries({
       //     //     data: tmline
@@ -307,12 +175,7 @@
       //     // });
       //   // }
       //   console.log(tmline);
-
-
       // });
-
-
-
         function IncrementLine(tm) {
           // if (DSPCHT.series.length <= 5) {
             DSPCHT.addSeries({
@@ -342,25 +205,26 @@
           }
         }
 
-        function toggleText(button_id)  {
-          var text = document.getElementById(button_id).firstChild;
-          text.data = text.data == "[Hide]" ? "[Show]" : "[Hide]";
+        // function toggleText(button_id)  {
+        //   var text = document.getElementById(button_id).firstChild;
+        //   text.data = text.data == "[Hide]" ? "[Show]" : "[Hide]";
+        // }
+
+        function BTN_SPD_DN(id){
+          var n = parseInt(document.getElementById("TXT_SPD_VAL").value);
+          if(n>1){
+            n--;
+          }
+          document.getElementById("TXT_SPD_VAL").value = n;
         }
 
-        function Btn_Reflash(){
-          // var i = 0;
-          // while( raw_key[i] != null ){
-          //   var s = "";
-          //   s += raw_key[i];
-          //   s += " : ";
-          //   s += raw_val[i];
-          //   ADD( raw_key[i], s );
-
-          //   // IncrementLine();
-          //   i++;
-          // }
+        function BTN_SPD_UP(id){
+          var n = parseInt(document.getElementById("TXT_SPD_VAL").value);
+          if(n<360000){
+            n++;
+          }
+          document.getElementById("TXT_SPD_VAL").value = n;
         }
-
 
       // $(function (){
       function ADD( btn_id, btn_text )  {
@@ -431,7 +295,7 @@
 
 
 
-  <body onload="reloadData( )" style="font-family:verdana;">
+  <body style="font-family:verdana;">
 
     <table border='0' cellpadding='0' cellspacing='0' width="98%">
       <tr style="height:20px"><td>&nbsp;</td></tr>
@@ -482,9 +346,10 @@
 
     <!-- button -->
     <!-- <button>Refresh</button> -->
-    <!-- <button id="BTN0" onclick="IncrementLine(); toggleText(this.id);">＋</button>
-    <button id="BTN1" onclick="DecrementLine(); toggleText(this.id);">－</button>
-    <button id="BTN_REFLASH" onclick=Btn_Reflash()>Reflash</button> -->
+    <!-- <button id="BTN_SPD_DN" onclick="BTN_SPD_DN(this.id);">－</button> -->
+    <input type="text" id="TXT_SPD_VAL" value="1000">mSec</input>
+    <!-- <button id="BTN_SPD_UP" onclick="BTN_SPD_UP(this.id);">＋</button> -->
+    <!-- <button id="BTN_REFLASH" onclick=Btn_Reflash()>Reflash</button> -->
 
 		<!-- <h1>Data List</h1> -->
     <!-- <input type="file" name="file" /> -->
