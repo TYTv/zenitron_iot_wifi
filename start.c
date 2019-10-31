@@ -37,6 +37,11 @@ void application_start( )
 
     web_start();
 
+    hts221_init();      /* temperature device */
+    lis2dh12_init();    /* accelerometer device */
+    kx122_init();       /* accelerometer device */
+    icm20602_init();    /* accelerometer device */
+
     console_start();
 
 }

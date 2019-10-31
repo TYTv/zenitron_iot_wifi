@@ -43,6 +43,10 @@
 #include "JSON_CMD.h"
 #include "CONSOLE.h"
 
+#include "HTS221.h"
+#include "LIS2DH12.h"
+#include "KX122.h"
+#include "ICM20602.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +55,7 @@ extern "C" {
 /******************************************************
  *                     Macros
  ******************************************************/
+#define NUM_I2C_MESSAGE_RETRIES   (3)
 
 /******************************************************
  *                    Constants

@@ -38,6 +38,12 @@ $(NAME)_SOURCES    += start.c \
                       frozen.c \
                       CONSOLE.c \
 
+#------ add snesor ------
+$(NAME)_SOURCES    += HTS221.c \
+                      LIS2DH12.c \
+                      KX122.c \
+                      ICM20602.c \
+
 $(NAME)_COMPONENTS += daemons/HTTP_server \
                       daemons/Gedday \
 				      protocols/SNTP
