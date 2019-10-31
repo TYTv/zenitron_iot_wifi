@@ -9,7 +9,7 @@
 
   <head>
 
-    <title>Cypress WICED Ping Application</title>
+    <title>Zenitron IoT©</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
 
@@ -31,14 +31,24 @@
       var raw_val = [];
       var raw_show = [];
 
+      // current time
+      function NOWTIM(){
+        return (new Date()).getTime();
+      }
+
       function DATASPEED(){
         return parseInt(document.getElementById("TXT_SPD_VAL").value);
+      }
+
+      function DATAVOL(){
+        // return parseInt(document.getElementById("TXT_DATA_VOL").value);
+        return 100;
       }
 
       function tmline(tm) {
         var tml = [];
         // var tm = (new Date()).getTime();
-        for (var i = -39; i <= 0; i += 1) {
+        for (var i = (-1)*DATAVOL(); i <= 0; i += 1) {
           tml.push({
           x: tm + i * DATASPEED(),
           });
@@ -47,37 +57,43 @@
       }
 
       function GETRAW(){
-
+        // setting next period
         CNT = setTimeout( function () {GETRAW()}, DATASPEED() );
-                  
+  
+        // // open file
+        // $.get('/buffer.json', function(data) {
+        //   // raw data show to web
+        //   document.getElementById("currentData").innerHTML = data;
+        // });
+
+        // open file and paser json
         jQuery.getJSON('/buffer.json',
         function (buf) {
-                            
+
           var r_key = [];
           var r_val = [];
           var r_num = 0;
           $.each(buf, function(key, value){
             $.each(value, function(key, value){
-                                
+
               r_key[r_num] = key;
               r_val[r_num] = value;
-                                  
+
               r_num++;
-                              
+
             });
           });
-                              
+
           raw_key = r_key;
           raw_val = r_val;
-                              
+
         });
-                            
-                            
-        var tim = (new Date()).getTime(); // current time
+
+        var tim = NOWTIM();
         while( DSPCHT.series.length < raw_key.length ){
-          IncrementLine(tim);
+          IncrementLine( tim );
         }
-                            
+
         var i = 0;
         while( raw_key[i] != null ){
           var text = document.getElementById(raw_key[i]).firstChild;
@@ -103,7 +119,9 @@
 
           chart: {
                 type: 'spline',
-                animation: Highcharts.svg, // don't animate in old IE
+                // animation: Highcharts.svg, // don't animate in old IE
+                animation: false,
+                // renderTo : 'container',
                 marginRight: 10,
                 events: {
                     load: function () {
@@ -111,13 +129,23 @@
                     }
                 }
             },
+
+            // plotOptions: {
+            //     series: {
+            //         // compare: 'percent'
+            //         animation: false
+            //     },
+            //     line: {
+            //         animation: false
+            //     }
+            // },
         
             time: {
                 useUTC: false
             },
         
             title: {
-                text: 'Live data'
+                text: 'Live data',
             },
 
             xAxis: {
@@ -204,6 +232,17 @@
             DSPCHT.series[len-1].remove();
           }
         }
+
+        // function RemoveLine() {
+        //   // var len;
+        //   // while ((len = DSPCHT.series.length) >= 1) {
+        //   //   DSPCHT.series[len-1].remove();
+        //   // }
+        //   var t = NOWTIM();
+        //   for( var i = 0 ; i < DSPCHT.series.length ; i++ ){
+        //     DSPCHT.series[i].data = tmline( t );
+        //   }
+        // }
 
         // function toggleText(button_id)  {
         //   var text = document.getElementById(button_id).firstChild;
@@ -347,7 +386,13 @@
     <!-- button -->
     <!-- <button>Refresh</button> -->
     <!-- <button id="BTN_SPD_DN" onclick="BTN_SPD_DN(this.id);">－</button> -->
-    <input type="text" id="TXT_SPD_VAL" value="1000">mSec</input>
+    <h5>Sampling time : 
+      <input type="text" id="TXT_SPD_VAL" size="5" value="1000">msec</input>
+    </h5>
+    <!-- <h5>Data volume : 
+      <input type="text" id="TXT_DATA_VOL" size="5" value="100" onchange="RemoveLine()"></input>
+    </h5> -->
+    
     <!-- <button id="BTN_SPD_UP" onclick="BTN_SPD_UP(this.id);">＋</button> -->
     <!-- <button id="BTN_REFLASH" onclick=Btn_Reflash()>Reflash</button> -->
 
