@@ -1,6 +1,8 @@
 #include "KX122.h"
 
-char kx122_data[50];
+//char kx122_data[kx122_siz];
+//static wiced_timed_event_t sensor_timed_event;
+uint8_t kx122_init_success = 0;
 
 static wiced_i2c_device_t i2c_device_kx122 =
 {
@@ -29,8 +31,6 @@ wiced_result_t kx122_init(void)
         WPRINT_APP_INFO( ( "Failed to connect to KX122 device; addr 0x%x\n", i2c_device_kx122.address ) );
         return WICED_ERROR;
     }
-
-
 
     wbuf[0] = KX122_WHO_AM_I;
     wiced_i2c_write( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, wbuf, 1 );
@@ -75,18 +75,28 @@ wiced_result_t kx122_init(void)
     wbuf[1] = rbuf[0] | KX122_CNTL1_PC1;
     wiced_i2c_write( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, wbuf, 2 );
 
+    // get sensor data service
+//    wiced_rtos_register_timed_event( &sensor_timed_event, WICED_NETWORKING_WORKER_THREAD, &kx122_get, 100, 0 );
+
+    kx122_init_success = 1;
+
+    return WICED_SUCCESS;
 }
 
 
 int kx122_get(int argc, char *argv[])
 {
+    if( kx122_init_success == 0 ){
+        return kx122_init_success;
+    }
+
     uint8_t wbuf[1];
     uint8_t rbuf[6];
     int16_t acc[3];
     uint16_t _g_sens = 0;
     float data[3];
 
-//while(1){
+    // i2c read setting
     wbuf[0] = KX122_CNTL1;
     wiced_i2c_write( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, wbuf, 1 );
     wiced_i2c_read( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, rbuf, 1 );
@@ -107,6 +117,7 @@ int kx122_get(int argc, char *argv[])
           break;
     }
 
+    // i2c read x y z data
     wbuf[0] = KX122_XOUT_L;
     wiced_i2c_write( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, wbuf, 1 );
     wiced_i2c_read( &i2c_device_kx122, WICED_I2C_START_FLAG | WICED_I2C_STOP_FLAG, rbuf, 6 );
@@ -120,13 +131,16 @@ int kx122_get(int argc, char *argv[])
     data[1] = (float)acc[1] / _g_sens;
     data[2] = (float)acc[2] / _g_sens;
 
-    sprintf(kx122_data, "x: %fg\ty: %fg\tz: %fg\r\n", data[0], data[1], data[2]);
+    // make json command and parser
 
-//    WPRINT_APP_INFO(("x: %fg\t", data[0]));
-//    WPRINT_APP_INFO(("y: %fg\t", data[1]));
-//    WPRINT_APP_INFO(("z: %fg\n", data[2]));
-    WPRINT_APP_INFO(("%s",kx122_data));
+    char par0[] = {"json_parser"};
+    char par1[] = {"0"};
+    char par2[rawsiz] = {NULL};
+    sprintf(par2, "{\"KX122_X(mG)\":%f,\"KX122_Y(mG)\":%f,\"KX122_Z(mG)\":%f}", data[0]*1000, data[1]*1000, data[2]*1000);
+    char *cmd[] = {par0, par1, par2};
+    json_parser(3, cmd);
 
-//}
+    // show to uart
+    WPRINT_APP_INFO(( "%s %s %s\r\n", cmd[0], cmd[1], cmd[2] ));
 
 }

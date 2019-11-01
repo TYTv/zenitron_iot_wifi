@@ -81,4 +81,5 @@
 wiced_result_t kx122_init(void);
 int kx122_get(int argc, char *argv[]);
 
-extern char kx122_data[50];
+//#define kx122_siz 120
+//extern char kx122_data[kx122_siz];

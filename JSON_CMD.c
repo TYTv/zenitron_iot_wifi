@@ -39,7 +39,6 @@ int json_parser(int argc, char *argv[])
 
 
 //    struct json_token key, val;
-
     // ------ get raw data from command line ------
     uint8_t raw[rawsiz] = "";
     uint32_t sn;
