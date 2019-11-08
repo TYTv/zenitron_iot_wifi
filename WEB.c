@@ -71,12 +71,12 @@
  */
 
 #include "wiced.h"
-#include "WEB.h"
+//#include "WEB.h"
 #include "http_server.h"
-#include "gedday.h"
-#include "wiced_resource.h"
+//#include "gedday.h"
+//#include "wiced_resource.h"
 #include "resources.h"
-#include "ping_webserver_dct.h"
+//#include "ping_webserver_dct.h"
 
 #include "start.h"
 
@@ -104,19 +104,20 @@
  *               Static Function Declarations
  ******************************************************/
 
-static wiced_result_t send_ping    ( void* arg );
-static int32_t        process_ping ( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data );
+//static wiced_result_t send_ping    ( void* arg );
+//static int32_t        process_ping ( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data );
 static int32_t        process_json ( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data );
 
 /******************************************************
  *               Variable Definitions
  ******************************************************/
 
-static char           ping_description[PING_DESCRIPTION_LEN];
-static char           ping_results    [PING_HISTORY_LEN][PING_RESULT_LEN];
-static wiced_mutex_t  ping_mutex;
-static uint32_t       ping_start_index;
-static uint32_t       ping_end_index;
+//static char           ping_description[PING_DESCRIPTION_LEN];
+//static char           ping_results    [PING_HISTORY_LEN][PING_RESULT_LEN];
+//static wiced_mutex_t  ping_mutex;
+static wiced_mutex_t  mutex;
+//static uint32_t       ping_start_index;
+//static uint32_t       ping_end_index;
 
 static wiced_http_server_t http_server;
 //static wiced_timed_event_t ping_timed_event;
@@ -150,7 +151,7 @@ START_OF_HTTP_PAGE_DATABASE(web_pages)
 END_OF_HTTP_PAGE_DATABASE();
 
 #if 1   // SOFT AP MODE
-static const wiced_ip_setting_t device_init_ip_settings =
+const wiced_ip_setting_t device_init_ip_settings =
 {
     INITIALISER_IPV4_ADDRESS( .ip_address, MAKE_IPV4_ADDRESS(192, 168, 0,  1) ),
     INITIALISER_IPV4_ADDRESS( .netmask,    MAKE_IPV4_ADDRESS(255, 255, 255, 0) ),
@@ -172,11 +173,11 @@ static const wiced_interface_t wiced_network_interface = WICED_STA_INTERFACE;
 void web_start(void)
 {
     /* Init data */
-    ping_start_index = 0;
-    ping_end_index   = 0;
-    memset( ping_results,    ' ', sizeof( ping_results ) );
-    memset( ping_description, 0, sizeof( ping_description ) );
-    wiced_rtos_init_mutex(&ping_mutex);
+//    ping_start_index = 0;
+//    ping_end_index   = 0;
+//    memset( ping_results,    ' ', sizeof( ping_results ) );
+//    memset( ping_description, 0, sizeof( ping_description ) );
+//    wiced_rtos_init_mutex(&ping_mutex);
     wiced_result_t result;
     uint16_t max_sockets = 10;
     /* Initialise the device */
@@ -190,10 +191,12 @@ void web_start(void)
 
     if ( result == WICED_SUCCESS )
     {
-        ping_dct_t* dct_app;
+//        ping_dct_t* dct_app;
+        wiced_config_soft_ap_t* soft_ap;
 
         /* Get app specific data from Non Volatile DCT */
-        wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
+//        wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
+        wiced_dct_read_lock( (void**) &soft_ap, WICED_TRUE, DCT_WIFI_CONFIG_SECTION, OFFSETOF(platform_dct_wifi_config_t, soft_ap_settings), sizeof(wiced_config_soft_ap_t) );
 
         /* The ping target is the gateway */
         wiced_ip_get_gateway_address( wiced_network_interface, &ping_target_ip );
@@ -224,13 +227,14 @@ void web_start(void)
 
 
         /* Start a web server to display ping results */
-        wiced_http_server_start( &http_server, 80, max_sockets, web_pages, wiced_network_interface, DEFAULT_URL_PROCESSOR_STACK_SIZE );
+          wiced_http_server_start( &http_server, 80, max_sockets, web_pages, wiced_network_interface, DEFAULT_URL_PROCESSOR_STACK_SIZE );
 
 //        /* Start Gedday to advertise the webservice */
 //        gedday_init(wiced_network_interface, "wiced_ping_webserver");
 //        gedday_add_service("Ping App Webserver", "_http._tcp.local", 80, "");
 
-        wiced_dct_read_unlock( dct_app, WICED_FALSE );
+//        wiced_dct_read_unlock( dct_app, WICED_FALSE );
+        wiced_dct_read_unlock( soft_ap, WICED_FALSE );
 
     }
     else
@@ -287,31 +291,31 @@ void web_start(void)
 
 
 /* Update the ping webpage with the latest ping results */
-static int32_t process_ping( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
-{
-    int a;
-    UNUSED_PARAMETER( url_path );
-    UNUSED_PARAMETER( http_data );
-
-//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
-    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html );
-    wiced_http_response_stream_write( stream, ping_description, strlen( ping_description ) );
-//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_desc2_end );
-    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc2_end );
-
-    wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
-    for ( a = PING_HISTORY_LEN - 1; a >= 0; a-- )
-    {
-        char* res = ping_results[( ping_start_index + a ) % PING_HISTORY_LEN];
-        wiced_http_response_stream_write( stream, res, strlen(res) );
-//        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
-        wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_row_end );
-    }
-//    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
-    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_list_end );
-    wiced_rtos_unlock_mutex( &ping_mutex );
-    return 0;
-}
+//static int32_t process_ping( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
+//{
+//    int a;
+//    UNUSED_PARAMETER( url_path );
+//    UNUSED_PARAMETER( http_data );
+//
+////    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html );
+//    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html );
+//    wiced_http_response_stream_write( stream, ping_description, strlen( ping_description ) );
+////    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_desc2_end );
+//    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc2_end );
+//
+//    wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
+//    for ( a = PING_HISTORY_LEN - 1; a >= 0; a-- )
+//    {
+//        char* res = ping_results[( ping_start_index + a ) % PING_HISTORY_LEN];
+//        wiced_http_response_stream_write( stream, res, strlen(res) );
+////        wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_row_end );
+//        wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_row_end );
+//    }
+////    wiced_http_response_stream_write_resource( stream, &resources_apps_DIR_res_DIR_table_html_list_end );
+//    wiced_http_response_stream_write_resource( stream, &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_list_end );
+//    wiced_rtos_unlock_mutex( &ping_mutex );
+//    return 0;
+//}
 
 static int32_t process_json( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
 {
@@ -324,7 +328,8 @@ static int32_t process_json( const char* url_path, const char* url_parameters, w
     UNUSED_PARAMETER( arg );
     UNUSED_PARAMETER( http_data );
 
-    wiced_rtos_lock_mutex( &ping_mutex ); /* Stops app thread writing ping data halfway through a read */
+    wiced_rtos_init_mutex(&mutex);
+    wiced_rtos_lock_mutex( &mutex ); /* Stops app thread writing ping data halfway through a read */
 
     uint8_t tmp[rawsiz*datnum] = "";
     for(uint32_t i=0;i<datnum;i++){
@@ -343,7 +348,7 @@ static int32_t process_json( const char* url_path, const char* url_parameters, w
 
     wiced_http_response_stream_write( stream, (const void*)&tmp, strlen( tmp ) );
 
-    wiced_rtos_unlock_mutex( &ping_mutex );
+    wiced_rtos_unlock_mutex( &mutex );
     return 0;
 }
 

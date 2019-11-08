@@ -38,6 +38,7 @@ $(NAME)_SOURCES    += start.c \
                       frozen.c \
                       CONSOLE.c \
                       SENSOR.c \
+                      OTA.c \
 
 #------ add snesor ------
 $(NAME)_SOURCES    += HTS221.c \
@@ -47,11 +48,15 @@ $(NAME)_SOURCES    += HTS221.c \
                       BH1745NUC.c \
 
 $(NAME)_COMPONENTS += daemons/HTTP_server \
-                      daemons/Gedday \
-				      protocols/SNTP
+
+#                      daemons/Gedday \
+#				      protocols/SNTP
 
 $(NAME)_COMPONENTS += utilities/command_console \
-                      utilities/command_console/ping
+
+#                      utilities/command_console/ping
+                      
+$(NAME)_COMPONENTS += daemons/ota_server
 
 #$(NAME)_COMPONENTS += protocols/Xively
 
@@ -85,11 +90,16 @@ $(NAME)_RESOURCES  += ../apps/work/zenitron_iot_wifi/res/index.html \
 					  apps/res/jquery-1.12.4.min.js \
 					  ../apps/work/zenitron_iot_wifi/res/highcharts.js
 
-APPLICATION_DCT    += ping_webserver_dct.c
+#APPLICATION_DCT    += ping_webserver_dct.c
 
 WIFI_CONFIG_DCT_H  += wifi_config_dct.h
 
-ifeq ($(PLATFORM),$(filter $(PLATFORM), CYW9MCU7X9N364))
-GLOBAL_DEFINES += APPLICATION_STACK_SIZE=14*1024
-GLOBAL_DEFINES += WICED_DISABLE_TLS
-endif
+#ifeq ($(PLATFORM),$(filter $(PLATFORM), CYW9MCU7X9N364))
+#GLOBAL_DEFINES += APPLICATION_STACK_SIZE=14*1024
+#GLOBAL_DEFINES += WICED_DISABLE_TLS
+#endif
+
+#FR_APP    := $(OUTPUT_DIR)/binary/$(CLEANED_BUILD_STRING).stripped.elf
+#DCT_IMAGE := $(OUTPUT_DIR)/DCT.stripped.elf
+#
+#INVALID_PLATFORMS := CYW9MCU7X9N364
