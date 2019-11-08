@@ -41,6 +41,7 @@ void application_start( )
     lis2dh12_init();    /* accelerometer device */
     kx122_init();       /* accelerometer device */
     icm20602_init();    /* accelerometer device */
+    bh1745nuc_init();   /* color device */
 
     console_start();
 

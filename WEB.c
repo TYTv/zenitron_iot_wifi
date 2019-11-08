@@ -315,8 +315,9 @@ static int32_t process_ping( const char* url_path, const char* url_parameters, w
 
 static int32_t process_json( const char* url_path, const char* url_parameters, wiced_http_response_stream_t* stream, void* arg, wiced_http_message_body_t* http_data )
 {
-
+    // get sensor data
     kx122_get(NULL,NULL);
+    bh1745nuc_get(NULL,NULL);
 
     UNUSED_PARAMETER( url_path );
     UNUSED_PARAMETER( url_parameters );

@@ -72,10 +72,9 @@
 
 
 
-
+#define KX122_PartName          "KX122"
 
 #define KX122_DEVICE_ADDRESS_1E         (0x1E)    // 7bit Address
-#define BH1749NUC_DEVICE_ADDRESS_38     (0x38)    // 7bit Addrss
 #define BM1383AGLV_DEVICE_ADDRESS       (0x5D)    // 7bit Addrss
 
 wiced_result_t kx122_init(void);

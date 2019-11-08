@@ -37,12 +37,14 @@ $(NAME)_SOURCES    += start.c \
                       JSON_CMD.c \
                       frozen.c \
                       CONSOLE.c \
+                      SENSOR.c \
 
 #------ add snesor ------
 $(NAME)_SOURCES    += HTS221.c \
                       LIS2DH12.c \
                       KX122.c \
                       ICM20602.c \
+                      BH1745NUC.c \
 
 $(NAME)_COMPONENTS += daemons/HTTP_server \
                       daemons/Gedday \
