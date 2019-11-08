@@ -201,34 +201,34 @@ void web_start(void)
         /* Setup a regular ping event and setup the callback to run in the networking worker thread */
 //        wiced_rtos_register_timed_event( &ping_timed_event, WICED_NETWORKING_WORKER_THREAD, &send_ping, dct_app->ping_period_ms, 0 );
 
-        uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
-
-        char ping_description_raw[200];
-        sprintf(ping_description_raw, "Pinging %u.%u.%u.%u every %ums with a %ums timeout.",
-                                                 (unsigned int)((ipv4 >> 24) & 0xFF),
-                                                 (unsigned int)((ipv4 >> 16) & 0xFF),
-                                                 (unsigned int)((ipv4 >>  8) & 0xFF),
-                                                 (unsigned int)((ipv4 >>  0) & 0xFF),
-                                                 (unsigned int)dct_app->ping_period_ms,
-                                                 (unsigned int)dct_app->ping_timeout_ms);
-        /* Print ping description to the UART */
-        WPRINT_APP_INFO(("%s\n", ping_description_raw));
-
-        /* Print ping description to HTML for the webpage */
-        char* tmp_str = ping_description;
-        uint32_t size;
-        tmp_str += sprintf( ping_description, "%s", ping_description_raw );
-//        resource_read ( &resources_apps_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
-        resource_read ( &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
-        sprintf( ping_description, "Last %d replies ...", PING_HISTORY_LEN );
+//        uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
+//
+//        char ping_description_raw[200];
+//        sprintf(ping_description_raw, "Pinging %u.%u.%u.%u every %ums with a %ums timeout.",
+//                                                 (unsigned int)((ipv4 >> 24) & 0xFF),
+//                                                 (unsigned int)((ipv4 >> 16) & 0xFF),
+//                                                 (unsigned int)((ipv4 >>  8) & 0xFF),
+//                                                 (unsigned int)((ipv4 >>  0) & 0xFF),
+//                                                 (unsigned int)dct_app->ping_period_ms,
+//                                                 (unsigned int)dct_app->ping_timeout_ms);
+//        /* Print ping description to the UART */
+//        WPRINT_APP_INFO(("%s\n", ping_description_raw));
+//
+//        /* Print ping description to HTML for the webpage */
+//        char* tmp_str = ping_description;
+//        uint32_t size;
+//        tmp_str += sprintf( ping_description, "%s", ping_description_raw );
+////        resource_read ( &resources_apps_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
+//        resource_read ( &resources____DIR_apps_DIR_work_DIR_zenitron_iot_wifi_DIR_res_DIR_table_html_desc1_end, 0, sizeof(ping_description)-(tmp_str-ping_description), &size, tmp_str );
+//        sprintf( ping_description, "Last %d replies ...", PING_HISTORY_LEN );
 
 
         /* Start a web server to display ping results */
         wiced_http_server_start( &http_server, 80, max_sockets, web_pages, wiced_network_interface, DEFAULT_URL_PROCESSOR_STACK_SIZE );
 
-        /* Start Gedday to advertise the webservice */
-        gedday_init(wiced_network_interface, "wiced_ping_webserver");
-        gedday_add_service("Ping App Webserver", "_http._tcp.local", 80, "");
+//        /* Start Gedday to advertise the webservice */
+//        gedday_init(wiced_network_interface, "wiced_ping_webserver");
+//        gedday_add_service("Ping App Webserver", "_http._tcp.local", 80, "");
 
         wiced_dct_read_unlock( dct_app, WICED_FALSE );
 
@@ -241,49 +241,49 @@ void web_start(void)
 
 
 /* Sends a ping to the target */
-static wiced_result_t send_ping( void* arg )
-{
-    uint32_t elapsed_ms;
-    wiced_result_t status;
-    ping_dct_t* dct_app;
-
-    wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
-
-    status = wiced_ping( wiced_network_interface, &ping_target_ip, dct_app->ping_timeout_ms, &elapsed_ms );
-
-    wiced_dct_read_unlock( dct_app, WICED_FALSE );
-
-    wiced_rtos_lock_mutex( &ping_mutex );  /* Stop webserver thread reading ping data halfway through a write */
-
-    uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
-    char ping_ip_number[16];
-    sprintf(ping_ip_number, "%u.%u.%u.%u", (unsigned int)((ipv4 >> 24) & 0xFF),
-                                           (unsigned int)((ipv4 >> 16) & 0xFF),
-                                           (unsigned int)((ipv4 >>  8) & 0xFF),
-                                           (unsigned int)((ipv4 >>  0) & 0xFF));
-    if ( status == WICED_SUCCESS )
-    {
-        WPRINT_APP_INFO(("Ping %s Reply : %lu ms\n", ping_ip_number, (unsigned long)elapsed_ms ));
-        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : %5ld ms", ping_ip_number, (long)elapsed_ms );
-    }
-    else if ( status == WICED_TIMEOUT )
-    {
-        WPRINT_APP_INFO(("Ping %s timeout\n", ping_ip_number));
-        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : timeout", ping_ip_number );
-    }
-    else
-    {
-        WPRINT_APP_INFO(("Ping %s error\n", ping_ip_number));
-        sprintf( (char*) ping_results[ping_end_index], "Ping %s error", ping_ip_number );
-    }
-
-    ping_end_index = ( ping_end_index + 1 ) % PING_HISTORY_LEN;
-    ping_start_index = ( ( ping_results[ping_end_index][0] == ' ' ) ? 0 : ping_end_index );
-
-    wiced_rtos_unlock_mutex( &ping_mutex );
-
-    return WICED_SUCCESS;
-}
+//static wiced_result_t send_ping( void* arg )
+//{
+//    uint32_t elapsed_ms;
+//    wiced_result_t status;
+//    ping_dct_t* dct_app;
+//
+//    wiced_dct_read_lock( (void**)&dct_app, WICED_FALSE, DCT_APP_SECTION, 0, sizeof(ping_dct_t) );
+//
+//    status = wiced_ping( wiced_network_interface, &ping_target_ip, dct_app->ping_timeout_ms, &elapsed_ms );
+//
+//    wiced_dct_read_unlock( dct_app, WICED_FALSE );
+//
+//    wiced_rtos_lock_mutex( &ping_mutex );  /* Stop webserver thread reading ping data halfway through a write */
+//
+//    uint32_t ipv4 = GET_IPV4_ADDRESS(ping_target_ip);
+//    char ping_ip_number[16];
+//    sprintf(ping_ip_number, "%u.%u.%u.%u", (unsigned int)((ipv4 >> 24) & 0xFF),
+//                                           (unsigned int)((ipv4 >> 16) & 0xFF),
+//                                           (unsigned int)((ipv4 >>  8) & 0xFF),
+//                                           (unsigned int)((ipv4 >>  0) & 0xFF));
+//    if ( status == WICED_SUCCESS )
+//    {
+//        WPRINT_APP_INFO(("Ping %s Reply : %lu ms\n", ping_ip_number, (unsigned long)elapsed_ms ));
+//        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : %5ld ms", ping_ip_number, (long)elapsed_ms );
+//    }
+//    else if ( status == WICED_TIMEOUT )
+//    {
+//        WPRINT_APP_INFO(("Ping %s timeout\n", ping_ip_number));
+//        sprintf( (char*) ping_results[ping_end_index], "Ping %s reply : timeout", ping_ip_number );
+//    }
+//    else
+//    {
+//        WPRINT_APP_INFO(("Ping %s error\n", ping_ip_number));
+//        sprintf( (char*) ping_results[ping_end_index], "Ping %s error", ping_ip_number );
+//    }
+//
+//    ping_end_index = ( ping_end_index + 1 ) % PING_HISTORY_LEN;
+//    ping_start_index = ( ( ping_results[ping_end_index][0] == ' ' ) ? 0 : ping_end_index );
+//
+//    wiced_rtos_unlock_mutex( &ping_mutex );
+//
+//    return WICED_SUCCESS;
+//}
 
 
 /* Update the ping webpage with the latest ping results */
