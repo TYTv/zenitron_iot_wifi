@@ -6,7 +6,14 @@ uint8_t kx122_init_success = 0;
 
 static wiced_i2c_device_t i2c_device_kx122 =
 {
-    .port = WICED_I2C_2,  //I2C_1
+#ifdef AWCU359              // for AW-CU359 EVB use
+    .port = WICED_I2C_2,
+#elif AWCU427               // for AW-CU427 EVB use
+    .port = WICED_I2C_4,
+    .flags = I2C_DEVICE_NO_DMA,
+#else
+    .port = WICED_I2C_1,
+#endif
     .address = KX122_DEVICE_ADDRESS_1E,
     .address_width = I2C_ADDRESS_WIDTH_7BIT,
     .speed_mode = I2C_STANDARD_SPEED_MODE,
