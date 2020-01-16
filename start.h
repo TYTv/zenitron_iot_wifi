@@ -43,6 +43,7 @@
 #include "JSON_CMD.h"
 #include "CONSOLE.h"
 #include "OTA.h"
+#include "FACTORY.h"
 
 #include "SENSOR.h"
 #include "HTS221.h"

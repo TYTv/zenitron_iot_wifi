@@ -39,6 +39,7 @@ $(NAME)_SOURCES    += start.c \
                       CONSOLE.c \
                       SENSOR.c \
                       OTA.c \
+                      FACTORY.c \
 
 #------ add snesor ------
 $(NAME)_SOURCES    += HTS221.c \
@@ -103,3 +104,4 @@ WIFI_CONFIG_DCT_H  += wifi_config_dct.h
 #DCT_IMAGE := $(OUTPUT_DIR)/DCT.stripped.elf
 #
 #INVALID_PLATFORMS := CYW9MCU7X9N364
+

@@ -14,6 +14,8 @@ void ota_start(void)
     wiced_config_soft_ap_t* soft_ap;
     wiced_result_t          result;
 
+    wiced_init();
+
     result = wiced_network_up( WICED_AP_INTERFACE, WICED_USE_INTERNAL_DHCP_SERVER, &device_init_ip_settings );
     if ( result != WICED_SUCCESS ){
         WPRINT_APP_INFO(("Network up error!\r\n"));
@@ -37,4 +39,5 @@ void ota_start(void)
     WPRINT_APP_INFO( ( "           passphrase: %s\r\n\r\n", ssid_name));
     wiced_dct_read_unlock( soft_ap, WICED_FALSE );
 
+    while(1){;}
 }
